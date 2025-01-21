@@ -57,8 +57,42 @@ public class MemorySpace {
 	 *        the length (in words) of the memory block that has to be allocated
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
-	public int malloc(int length) {		
-		//// Replace the following statement with your code
+	public int malloc(int length) {	
+		if (length <= 0) {
+			throw new IllegalArgumentException("Block size must be positive");
+		}	
+		
+		// Create an iterator for the freeList
+		ListIterator freeIterator = freeList.iterator();
+		
+		while (freeIterator.hasNext()) {
+			MemoryBlock freeBlock = freeIterator.next();
+
+			if (freeBlock.length >= length) {
+				int baseAddress = freeBlock.baseAddress;
+
+				// Case 1: Exact match
+				if (freeBlock.getLength() == length) {
+					// Remove from freeList
+					freeList.remove(freeBlock);
+					// Add to allocatedList
+					allocatedList.addLast(freeBlock); 
+				}
+				// Case 2: Split the block
+				else{
+					// Create the allocated
+					MemoryBlock allocatedBlock = new MemoryBlock(baseAddress, length);
+					allocatedList.addLast(allocatedBlock);
+
+					// Update the free block's properties
+					freeBlock.setBaseAddress(baseAddress + length);
+					freeBlock.setLength(freeBlock.length - length);
+				}
+
+				return baseAddress;
+			}
+		}
+		// If no suitable block is found
 		return -1;
 	}
 
@@ -71,7 +105,29 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		//// Write your code here
+		// Locate the block in the allocatedList
+		ListIterator allocatedIterator = allocatedList.iterator();
+		MemoryBlock blockToFree = null;
+
+		while (allocatedIterator.hasNext()) {
+			MemoryBlock currentBlock = allocatedIterator.next();
+			if (currentBlock.getBaseAddress() == address) {
+				blockToFree = currentBlock;
+				break;
+			}
+		}
+
+		if (blockToFree == null) {
+			throw new IllegalArgumentException("Block with base address " + address + " not found in allocated list");
+		}
+
+		// Remove the block from the allocatedList
+		allocatedList.remove(blockToFree);
+
+		// Add the block back to the freeList and attempt merging with adjacent blocks
+		freeList.addLast(blockToFree);
+		defrag(); // merge free blocks for proper memory cleanup
+		
 	}
 	
 	/**
@@ -88,7 +144,38 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-		/// TODO: Implement defrag test
-		//// Write your code here
+		if (freeList == null || freeList.iterator().hasNext() == false) {
+			return; // Nothing to defragment if freeList is empty
+		}
+
+		// Sort the free list by the base address to ensure contiguous blocks are adjacent
+		freeList.sortByBaseAddress();
+
+		// Create a temporary list to store merged free blocks
+		LinkedList mergedFreeList = new LinkedList();
+
+		// Create an iterator for the sorted free list
+		ListIterator freeIterator = freeList.iterator();
+		MemoryBlock previousBlock = freeIterator.next(); // Get the first block in the sorted list
+		
+		while (freeIterator.hasNext()) {
+			MemoryBlock currentBlock = freeIterator.next();
+
+			// If the previous block is adjacent to the current block, merge them
+			if (previousBlock.getBaseAddress() + previousBlock.getLength() == currentBlock.getBaseAddress()) {
+				// Merge blocks
+				previousBlock.setLength(previousBlock.getLength() + currentBlock.getLength());
+			}
+			else{
+				mergedFreeList.addLast(previousBlock);
+				previousBlock = currentBlock; // Move to the next block
+			}
+		}
+		
+		// Add the last block to the merged list
+		mergedFreeList.addLast(previousBlock);
+
+		// Replace the old freeList with the mergedFreeList
+		freeList = mergedFreeList;
 	}
 }
