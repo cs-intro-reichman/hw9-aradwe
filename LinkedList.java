@@ -52,7 +52,7 @@ public class LinkedList {
 	public Node getNode(int index) {
 		if (index < 0 || index >= size) {
 			throw new IllegalArgumentException(
-					"index must be between 0 and size - 1");
+					"index must be between 0 and size");
 		}
 		Node current = first; // Start from the first node
 		for(int i = 0; i < index; i++){
@@ -188,7 +188,7 @@ public class LinkedList {
 	 */
 	public void remove(Node node) {
 		if (node == null || first == null) {
-			throw new IllegalArgumentException("Node cannot be null, and the list cannot be empty");
+			throw new NullPointerException();
 		}
 
 		// Special case: Removing the first node
