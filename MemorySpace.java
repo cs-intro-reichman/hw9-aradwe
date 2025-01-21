@@ -74,7 +74,7 @@ public class MemorySpace {
 				// Case 1: Exact match
 				if (freeBlock.getLength() == length) {
 					// Remove from freeList
-					freeList.remove(freeBlock);
+					freeIterator.remove();
 					// Add to allocatedList
 					allocatedList.addLast(freeBlock); 
 				}
