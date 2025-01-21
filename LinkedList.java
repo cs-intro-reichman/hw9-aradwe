@@ -203,21 +203,23 @@ public class LinkedList {
 
 		// Traverse the list to find the node before the one to remove
 		Node currentNode = first;
-		while (currentNode.next != null && currentNode != node) {
-			currentNode = currentNode.next;			
+		while (currentNode.next != null) {
+			if (currentNode.next == node) {
+				// Found the node before the target
+				currentNode.next = currentNode.next.next;
+				
+				// If the removed node was the last one, update the last pointer
+				if (currentNode.next == null) {
+					last = currentNode;
+				}
+				size--;
+				return;
+			}
+			currentNode = currentNode.next;
 		}
-
-		if (currentNode.next == null || currentNode == null) {
-			throw new IllegalArgumentException("Node not found in the list");
-		}
-
-		// Remove the node
-		currentNode.next = currentNode.next.next;
-		if (currentNode.next == null) { // If the removed node was the last node
-			last = currentNode;
-		}
-		size--;
-		return;
+		
+		// If we exit the loop, the node was not found
+		throw new IllegalArgumentException("Node not found in the list");
 	}
 
 	/**
