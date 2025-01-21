@@ -68,8 +68,8 @@ public class MemorySpace {
 		while (freeIterator.hasNext()) {
 			MemoryBlock freeBlock = freeIterator.next();
 
-			if (freeBlock.length >= length) {
-				int baseAddress = freeBlock.baseAddress;
+			if (freeBlock.getLength() >= length) {
+				int baseAddress = freeBlock.getBaseAddress();
 
 				// Case 1: Exact match
 				if (freeBlock.getLength() == length) {
