@@ -135,7 +135,32 @@ public class MemorySpace {
 	 * for debugging purposes.
 	 */
 	public String toString() {
-		return freeList.toString() + " \n" + allocatedList.toString();		
+		StringBuilder result = new StringBuilder();
+		// Iterate over the freeList
+		result.append(formatList(freeList));
+		result.append(" \n");
+	
+		// Iterate over the allocatedList
+		result.append(formatList(allocatedList));
+		result.append(" ");
+	
+		return result.toString();
+		
+		//return freeList.toString() + "\n" + allocatedList.toString();		
+	}
+
+	// Helper method to format a list as a space-separated string of MemoryBlocks
+	private String formatList(LinkedList list) {
+		StringBuilder formatted = new StringBuilder();
+		ListIterator iterator = list.iterator();
+		while (iterator.hasNext()) {
+			formatted.append(iterator.next().toString()).append(" ");
+		}
+		// Trim the trailing space, if any
+		if (formatted.length() > 0) {
+			formatted.setLength(formatted.length() - 1);
+		}
+		return formatted.toString();
 	}
 	
 	/**
