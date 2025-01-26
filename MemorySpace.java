@@ -11,6 +11,7 @@
 		// A list of memory blocks that are presently free
 		private LinkedList freeList;
 
+		// Total size of the memory space
 		private int maxSize;
 
 		/**
@@ -67,14 +68,19 @@
 
 		ListIterator freeIterator = freeList.iterator();
 
+		 // Scan the free list for a suitable block
 		while (freeIterator.hasNext()) {
 			MemoryBlock freeBlock = freeIterator.next();
 
 			if (freeBlock.getLength() > length) {
+				// Split the free block
 				int baseAddress = freeBlock.getBaseAddress();
 				MemoryBlock newBlock = new MemoryBlock(baseAddress, length);
+				
+				// Add the allocated block to the allocated list
 				allocatedList.addLast(newBlock);
 
+				// Update the free block
 				freeBlock.setBaseAddress(baseAddress + length);
 				freeBlock.setLength(freeBlock.getLength() - length);
 								
@@ -82,9 +88,9 @@
 			}
 
 			else if (freeBlock.getLength() == length) {
-				// Exact match
+				// Exact match: move the block from free list to allocated list
 				freeList.remove(freeBlock);
-				allocatedList.addLast(freeBlock);  // Add a new block to allocatedList
+				allocatedList.addLast(freeBlock);
 
 				return freeBlock.getBaseAddress();
 			}
@@ -108,15 +114,15 @@
 				throw new IllegalArgumentException("index must be between 0 and size");
 			}
 			
-			// Locate the block in the allocatedList
+			
 			ListIterator allocatedIterator = allocatedList.iterator();
 
+			// Find the block to free
 			while (allocatedIterator.current != null) {
 				MemoryBlock currentBlock = allocatedIterator.next();
 				if (currentBlock.getBaseAddress() == address) {
+					// Move the block to the free list
 					freeList.addLast(currentBlock);
-					
-					// Remove the block from the allocatedList
 					allocatedList.remove(currentBlock);
 					return;
 				}
@@ -129,20 +135,6 @@
 		 */
 		public String toString() {
 			return freeList.toString() + "\n" + allocatedList.toString() + "";
-		}
-
-		// Helper method to format a list as a space-separated string of MemoryBlocks
-		private String formatList(LinkedList list) {
-			StringBuilder formatted = new StringBuilder();
-			ListIterator iterator = list.iterator();
-			while (iterator.hasNext()) {
-				formatted.append(iterator.next().toString()).append(" ");
-			}
-			// Trim the trailing space, if any
-			if (formatted.length() > 0) {
-				formatted.setLength(formatted.length() - 1);
-			}
-			return formatted.toString();
 		}
 		
 		/**
