@@ -104,29 +104,23 @@
 		 *            the starting address of the block to freeList
 		 */
 		public void free(int address) {
+			if (allocatedList.getSize() == 0) {
+				throw new IllegalArgumentException("index must be between 0 and size");
+			}
+			
 			// Locate the block in the allocatedList
 			ListIterator allocatedIterator = allocatedList.iterator();
-			MemoryBlock blockToFree = null;
 
-			while (allocatedIterator.hasNext()) {
+			while (allocatedIterator.current != null) {
 				MemoryBlock currentBlock = allocatedIterator.next();
 				if (currentBlock.getBaseAddress() == address) {
-					blockToFree = currentBlock;
-					break;
+					freeList.addLast(currentBlock);
+					
+					// Remove the block from the allocatedList
+					allocatedList.remove(currentBlock);
+					return;
 				}
 			}
-
-			if (blockToFree == null) {
-				throw new IllegalArgumentException("Block with base address " + address + " not found in allocated list");
-			}
-
-			// Remove the block from the allocatedList
-			allocatedList.remove(blockToFree);
-
-			// Add the block back to the freeList and attempt merging with adjacent blocks
-			freeList.addLast(blockToFree);
-			defrag(); // merge free blocks for proper memory cleanup
-			
 		}
 		
 		/**
