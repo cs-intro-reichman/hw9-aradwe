@@ -28,14 +28,7 @@ public class MemoryBlock {
 	 * @return true if this block equals the other block, false otherwise
 	 */
 	public boolean equals(MemoryBlock other) {
-		if (this == other) {
-            return true;
-        }
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-        MemoryBlock that = (MemoryBlock) other;
-        return baseAddress == that.baseAddress && length == that.length;
+		return baseAddress == other.baseAddress && length == other.length;
 	}
 
 	public int getBaseAddress(){

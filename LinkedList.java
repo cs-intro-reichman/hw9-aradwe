@@ -267,7 +267,7 @@ public class LinkedList {
 	 * Returns an iterator over this list, starting with the first element.
 	 */
 	public ListIterator iterator(){
-		return new ListIterator(first);
+		return new ListIterator(first, this);
 	}
 
 	public void sortByBaseAddress(){
@@ -300,16 +300,16 @@ public class LinkedList {
 	 * For example: {(208,10)} -> {(218,5)} -> {(223,7)}
 	 */
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		Node currentNode = first;
-
-		while (currentNode != null) {
-			sb.append(currentNode);
-			if (currentNode.next != null) {
-				sb.append(" -> ");				
-			}
-			currentNode = currentNode.next;
+		if (this.first == null){
+			return "";
 		}
-		return sb.toString();
+		String result = "";
+
+		Node current = first;
+		while (current != null) {
+			result += current.toString() + " ";
+			current = current.next;
+		}
+		return result;
 	}
 }
